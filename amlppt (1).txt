@@ -1,0 +1,109 @@
+Sub CreatePresentation()
+    Dim pptApp As Object
+    Dim pptPres As Object
+    Dim slideIndex As Integer
+    
+    ' Create a new instance of PowerPoint
+    Set pptApp = CreateObject("PowerPoint.Application")
+    pptApp.Visible = True
+    
+    ' Create a new presentation
+    Set pptPres = pptApp.Presentations.Add
+    
+    ' Add title slide with specific layout and text
+    slideIndex = pptPres.Slides.Count + 1
+    pptPres.Slides.Add slideIndex, ppLayoutTitle
+    With pptPres.Slides(slideIndex)
+        .Shapes(1).TextFrame.TextRange.Text = "Covid19 and Pneumonia Detection using VGG"
+        .Shapes(1).TextFrame.TextRange.Font.Name = "Arial"
+        .Shapes(1).TextFrame.TextRange.Font.Size = 36 ' Change the font size as required
+        .Shapes(1).TextFrame.TextRange.Font.Bold = True
+        .Shapes(1).TextFrame.TextRange.Font.Color.RGB = RGB(0, 51, 102) ' Change the font color as required
+        
+        .Shapes(2).TextFrame.TextRange.Text = "Using VGG algorithum on Chest X-ray images"
+        .Shapes(2).TextFrame.TextRange.Font.Name = "Arial"
+        .Shapes(2).TextFrame.TextRange.Font.Size = 20 ' Change the font size as required
+        .Shapes(2).TextFrame.TextRange.Font.Color.RGB = RGB(0, 51, 102) ' Change the font color as required
+    End With
+  
+    
+    ' Loop through each section of the presentation and add slides with content and images
+    AddSlideWithCustomization pptPres, "CNN", "Convolutional Neural Network (CNN) is the extended version of artificial neural networks (ANN) which is predominantly used to extract the feature from the grid-like matrix dataset. For example visual datasets like images or videos where data patterns play an extensive role." & vbCrLf & "We used VGGNet-16 model which is a convulational neural network architecture which is mainly used in image classification and object recognition." & vbCrLf & "The VGG-16 model is a convolutional neural network (CNN) architecture that was proposed by the Visual Geometry Group (VGG) at the University of Oxford. It is characterized by its depth, consisting of 16 layers, including 13 convolutional layers and 3 fully connected layers.", , 32, 24
+    AddSlideWithCustomization pptPres, "VGG Architecture", "The VGG-16 configuration typically consists of 16 layers, including 13 convolutional layers and 3 fully connected layers. These layers are organized into blocks, with each block containing multiple convolutional layers followed by a max-pooling layer for downsampling.", "C:\Users\VARAD CHAUDHARI\Desktop\new.jpg", 32, 24
+    AddSlideWithCustomization pptPres, "VGG Architecture", "VGG16 is a convolutional neural network architecture that consists of 16 layers, including 13 convolutional layers and 3 fully connected layers. " & vbCrLf & "Transfer Learning: Pre-trained models like VGG16 have been trained on large-scale datasets like ImageNet, enabling them to capture generic image features. Fine-tuning VGG16 on X-ray images for COVID-19 and pneumonia detection requires relatively fewer annotated data compared to training from scratch." & vbCrLf & "VGG16 is known for its deep architecture, homogeneous structure, and use of relatively small convolutional filters.", , 32, 24
+    AddSlideWithCustomization pptPres, "Reasons to use VGGNet", "VGG16 is a deep convolutional neural network (CNN) that can automatically learn and extract intricate features from X-ray images, which is crucial for detecting subtle patterns associated with COVID-19 and pneumonia." & vbCrLf & "Interpretability: Understanding the features learned by different layers of VGG16 can provide insights into the visual characteristics of COVID-19 and pneumonia in X-ray images, aiding in medical diagnosis and decision-making. " & vbCrLf & "Effectiveness with Large Datasets: CNNs typically require large amounts of data for training, and medical datasets for pneumonia and COVID-19 detection can be extensive.", , 32, 24
+
+    ' Add the last slide with a "Thank You" message
+    slideIndex = pptPres.Slides.Count + 1
+    pptPres.Slides.Add slideIndex, ppLayoutTitle
+    With pptPres.Slides(slideIndex)
+        .Shapes(1).TextFrame.TextRange.Text = "Thank You"
+        .Shapes(1).TextFrame.TextRange.Font.Name = "Arial"
+        .Shapes(1).TextFrame.TextRange.Font.Size = 77 ' Change the font size as required
+        .Shapes(1).TextFrame.TextRange.Font.Bold = True
+        .Shapes(1).TextFrame.TextRange.Font.Color.RGB = RGB(0, 51, 102) ' Change the font color as required
+    End With
+    
+    ' Clean up
+    Set pptPres = Nothing
+    Set pptApp = Nothing
+End Sub
+
+Sub AddSlideWithCustomization(pptPres As Object, title As String, content As String, Optional imagePath As String = "", Optional titleSize As Integer = 32, Optional contentSize As Integer = 20)
+    Dim slideIndex As Integer
+    Dim slide As Object
+    Dim pic As Object
+    
+    ' Determine the index for the new slide
+    slideIndex = pptPres.Slides.Count + 1
+    
+    ' Add a slide with text layout
+    Set slide = pptPres.Slides.Add(slideIndex, ppLayoutText)
+    
+    ' Set title and content
+    With slide
+        ' Title
+        .Shapes(1).TextFrame.TextRange.Text = title
+        
+        ' Content
+        .Shapes(2).TextFrame.TextRange.Text = content
+        
+        ' Image
+        If imagePath <> "" Then
+            Set pic = .Shapes.AddPicture(imagePath, False, True, 100, 100, 500, 300)
+            
+            ' Resize the image to cover a good portion of the slide
+            With pic
+                .LockAspectRatio = msoTrue ' Maintain aspect ratio
+                .Width = .Width * 0.9 ' Resize width to 80% of slide width
+                .Height = .Height * 0.9 ' Resize height to 80% of slide height
+                .Left = (pptPres.PageSetup.SlideWidth - .Width) / 2  ' Center horizontally
+                .Top = (pptPres.PageSetup.SlideHeight - .Height) - 0.5 / 2  ' Center vertically
+            End With
+        End If
+        
+        ' Apply styles
+        ' Title font style
+        With .Shapes(1).TextFrame.TextRange.Font
+            .Name = "Calibri (Body)"
+            .Size = titleSize
+            .Bold = True
+            .Color.RGB = RGB(0, 51, 102) ' Dark blue color
+        End With
+        
+        ' Content font style
+        With .Shapes(2).TextFrame.TextRange.Font
+            .Name = "Calibri (Body)"
+            .Size = contentSize
+            .Color.RGB = RGB(51, 102, 153) ' Light blue color
+        End With
+        
+        ' Apply background color
+        .FollowMasterBackground = msoFalse
+        .Background.Fill.BackColor.RGB = RGB(255, 255, 255) ' White color
+    End With
+    
+    ' Clean up
+    Set pic = Nothing
+    Set slide = Nothing
+End Sub
